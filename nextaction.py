@@ -17,24 +17,26 @@ def next_action(api_token):
 	labels = requests.get("https://api.todoist.com/rest/v1/labels", headers={"Authorization": "Bearer %s" % api_token}).json()
 	
 	# Filter for projects that have either the serial or parallel sign
-	projects    = [x for x in projects if x["name"][-2:] in ["\xb7\xb7", "::"]]
+	projects = [x for x in projects if x["name"][-2:] in ["\xb7\xb7", "::"]]
 	na_label_id = [x for x in labels if x["name"] == "next-action"][0]["id"]
 	wf_label_id = [x for x in labels if x["name"] == "waiting"][0]["id"]
-	
+
 	# Find next actions
 	old_na_tasks = [x for x in tasks if na_label_id in x["label_ids"]]
 	new_na_tasks = []
-	
+
 	for project in projects:
 		if project["name"][-2:] == u"\xb7\xb7":
 			project_type = "serial"
 		elif project["name"][-2:] == "::":
 			project_type = "parallel"
 		
-		
 		# Extract the open top-level tasks for this project
 		project_tasks = [x for x in tasks if x["project_id"] == project["id"]]
 		open_tasks    = [x for x in project_tasks if x["completed"] == False and "parent" not in x.keys() and x["content"][-2:] != u" \xb7"]
+		
+		# Find tasks that are over 5 days old and not yet labeled '+5d
+		old_tasks = [x for x in open_tasks if x["completed"] == False and (datetime.now() - datetime.strptime(x["created"], "%Y-%m-%dT%H:%M:%SZ")).days >= 2]
 		
 		# These are the rules:
 		# - The next action is the open first task in the project that does not have
@@ -70,18 +72,18 @@ def next_action(api_token):
 		
 			if project_type == "serial":
 				break
-	
+
 	# Find out which tasks should be updated
 	remove_na_label = [x for x in old_na_tasks if x not in new_na_tasks]
 	add_na_label = [x for x in new_na_tasks if x not in old_na_tasks]
-	
+
 	# Update the tasks
 	for task in remove_na_label + add_na_label:
 		if task in remove_na_label:
 			task["label_ids"].remove(na_label_id)
 		else:
 			task["label_ids"].append(na_label_id)
-	
+
 		requests.post(
 			"https://api.todoist.com/rest/v1/tasks/%d" % task["id"],
 			data = json.dumps({
@@ -92,4 +94,3 @@ def next_action(api_token):
 				"X-Request-Id": str(uuid.uuid4()),
 				"Authorization": "Bearer %s" % api_token
 			})
-
