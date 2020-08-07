@@ -8,8 +8,8 @@ app = Flask(__name__)
 
 @app.route('/<api_token>')
 def index(api_token):
-    next_action(api_token)
-    return 'Magic performed!'
+	next_action(api_token)
+	return 'Magic performed!'
 
-app.run(host='0.0.0.0',
-        port=int(os.environ.get('PORT', 5000)))
+app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
