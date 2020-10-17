@@ -62,8 +62,8 @@ def next_action(api_token):
 	# PART 3: LABEL NEXT-ACTIONS
 	# --------------------------
 
-	# Filter for projects that have either the serial or parallel sign
-	projects    = [x for x in projects if x["name"][-2:] in ["\xb7\xb7", "::"]]
+	# Filter for projects that have no exclude sign
+	projects = [x for x in projects if x["name"][-2:] != "\xb7"]
 
 	# Find the labels ids of certain important labels
 	na_label_id = [x for x in labels if x["name"] == "next-action"][0]["id"]
@@ -135,12 +135,13 @@ def next_action(api_token):
 	for project in projects:
 		
 		# Determine the project type
-		if project["name"][-2:] == u"\xb7\xb7":
-			project_type = "serial"
-		elif project["name"][-2:] == "::":
+		if project["name"][-2:] == "::":
 			project_type = "parallel"
+		else:
+			project_type = "serial"
 			
-		# Extract the open top-level tasks for this project
+		# Extract the open top-level tasks for this project and exclude
+		# tasks that are marked exclude
 		project_tasks = [x for x in tasks if x["project_id"] == project["id"]]
 		open_tasks    = [x for x in project_tasks if x["completed"] == False and "parent" not in x.keys() and x["content"][-2:] != u" \xb7"]
 		
