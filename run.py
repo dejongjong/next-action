@@ -63,7 +63,7 @@ def next_action(api_token):
 	# --------------------------
 
 	# Filter for projects that have no exclude sign
-	projects = [x for x in projects if x["name"][-2:] != "\xb7"]
+	projects = [x for x in projects if x["name"][-2:] != " \xb7"]
 
 	# Find the labels ids of certain important labels
 	na_label_id = [x for x in labels if x["name"] == "next-action"][0]["id"]
