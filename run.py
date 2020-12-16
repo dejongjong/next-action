@@ -32,31 +32,31 @@ def next_action(api_token):
 
 	# PART 2: REORDER PROJECTS
 	# ------------------------
+ 
+  ## Add a 'last_completed' field to each project
+	#for project in projects:
 
-	# Add a 'last_completed' field to each project
-	for project in projects:
+	#	# Get all completed project tasks (can be none), and find the last completed date
+	#	project_tasks  = [x for x in completed_tasks if x['project_id']==project['id']]
+	#	last_completed = '1900-01-01'
 
-		# Get all completed project tasks (can be none), and find the last completed date
-		project_tasks  = [x for x in completed_tasks if x['project_id']==project['id']]
-		last_completed = '1900-01-01'
-
-		for task in project_tasks:
-			if task['completed_date'] > last_completed:
-				last_completed = task['completed_date']
+	#	for task in project_tasks:
+	#		if task['completed_date'] > last_completed:
+	#			last_completed = task['completed_date']
 				
-		project['last_completed'] = last_completed
+	#	project['last_completed'] = last_completed
 
 
-	focus_projects = [x for x in projects if x['color'] == 32]
-	child_order = 1
+	# focus_projects = [x for x in projects if x['color'] == 32]
+	# child_order = 1
 
-	for project in sorted(focus_projects, key=lambda x: x['last_completed']):
-		project_api = api.projects.get_by_id(project['id'])
-		project_api.reorder(child_order=child_order)
-		print(f"order {child_order}: {project['name']}")
-		child_order+=1
+	#for project in sorted(focus_projects, key=lambda x: x['last_completed']):
+	#	project_api = api.projects.get_by_id(project['id'])
+	#	project_api.reorder(child_order=child_order)
+	#	print(f"order {child_order}: {project['name']}")
+	#	child_order+=1
 
-	api.commit()
+	#api.commit()
 
 
 	# PART 3: LABEL NEXT-ACTIONS
