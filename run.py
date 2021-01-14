@@ -68,8 +68,8 @@ def next_action(api_token):
 	# Find the labels ids of certain important labels
 	na_label_id = [x for x in labels if x["name"] == "next-action"][0]["id"]
 	wf_label_id = [x for x in labels if x["name"] == "waiting"][0]["id"]
-	oh_label_id = [x for x in labels if x["name"] == "on-hold"][0]["id"]
-
+	dl_label_id = [x for x in labels if x["name"] == "delegated"][0]["id"]
+	
 	# Keep a list of next actions and tasks that are over 90 days old
 	next_actions = []
 
@@ -86,10 +86,10 @@ def next_action(api_token):
 			
 		# Find the waiting label and determine if tasks is far away
 		has_wf_label = wf_label_id in task["label_ids"]
-		has_oh_label = oh_label_id in task["label_ids"]
+		has_dl_label = dl_label_id in task["label_ids"]
 		is_in_future = days_until_due != None and days_until_due > 1
 				
-		return (has_wf_label or has_oh_label or is_in_future)
+		return (has_wf_label or has_dl_label or is_in_future)
 
 		
 	# Recursive function for processing a list of tasks
