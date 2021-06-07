@@ -66,6 +66,12 @@ def next_action(td_token):
         # Iterate over sections
         for section_id in np.unique([x['section_id'] for x in matched_tasks]):
     
+            # Skip if this is an ignored section
+            section = get_item_by_id(section_id, sections)
+            
+            if section is not None and section['name'][-2:] == " \xb7":
+                continue
+    
             # Grab the tasks in this section
             section_tasks = [
                 x for x in matched_tasks 
@@ -120,6 +126,15 @@ def get_label_id_by_name(name, labels):
         return label_ids[0]
 
 
+def get_item_by_id(id, items):
+    matched_items = [x for x in items if x['id'] == id]
+    
+    if len(matched_items) == 0:
+        return None
+    else:
+        return matched_items[0]
+
+
 def find_next_action(task):
     global incl_tasks, gets_na_label, blocked_label_ids
     
@@ -146,9 +161,9 @@ def find_next_action(task):
         for sub_task in sub_tasks:
             find_next_action(sub_task)
             
-        # Stop if this is a serial block
-        if task['content'][-2:] != "::":
-            return 
+            # Stop if this is a serial block
+            if sub_task['content'][-2:] != "::":
+                return
         
 
 def update_task(task, updates, td_token):
